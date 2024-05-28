@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-const PokemonPreview = ({ pokemon }) => {
+const PokemonPreview = ({ pokemon, onClick }) => {
   const [pokemonData, setPokemonData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,6 +26,10 @@ const PokemonPreview = ({ pokemon }) => {
         setLoading(false);
       });
   }, [pokemon.url]);
+
+  const handlePokemonClick = () => {
+    onClick(pokemonData); // Pasa los datos del Pokémon al manejar el clic
+  };
 
   if (loading) {
     return <div className="pokemon-container bg-white p-4 rounded-lg text-center shadow-md">Loading...</div>;
@@ -57,7 +61,7 @@ const PokemonPreview = ({ pokemon }) => {
   };
 
   return (
-    <div className={`pokemon-container bg-white p-4 rounded-lg text-center shadow-md hover:shadow-lg transition-shadow cursor-pointer`}>
+    <div className={`pokemon-container bg-white p-4 rounded-lg text-center shadow-md hover:shadow-lg transition-shadow cursor-pointer`} onClick={handlePokemonClick}>
       <img
         src={pokemonData.sprites.front_default}
         alt={pokemonData.name}
@@ -79,6 +83,7 @@ const PokemonPreview = ({ pokemon }) => {
 
 PokemonPreview.propTypes = {
   pokemon: PropTypes.object.isRequired,
+  onClick: PropTypes.func.isRequired, // Define el tipo de la función onClick como requerida
 };
 
 export default PokemonPreview;

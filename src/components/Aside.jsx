@@ -1,7 +1,18 @@
-const Aside = () => {
-  return (<div className="hidden lg:block">Aside</div>
-  
-  )
+// Aside.js
+import React from "react";
+import PokemonDetails from "./PokemonDetails";
+
+const Aside = ({ pokemon }) => {
+  return (
+    <aside className="bg-gray-200 p-4 rounded-lg">
+      <h2 className="text-xl font-bold mb-4">Pokemon Details</h2>
+      {pokemon ? (
+        <PokemonDetails pokemon={pokemon} />
+      ) : (
+        <div>No Pokemon selected</div>
+      )}
+    </aside>
+  );
 };
 
 export default Aside;
