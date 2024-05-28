@@ -2,24 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import PokemonPreview from './PokemonPreview';
 
-// Componente que recibe la lista de Pokémons y renderiza cada uno
 const PokemonList = ({ pokemons }) => {
   return (
-    <section>
-      {pokemons.map((pokemon) => {
-        console.log(pokemon); // Verificar la estructura del objeto pokemon
-        return <PokemonPreview key={pokemon.url} pokemonURL={pokemon.url} />;
-      })}
+    <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+      {pokemons.map((pokemon) => (
+        <PokemonPreview key={pokemon.url} pokemon={pokemon} />
+      ))}
     </section>
   );
 };
 
 PokemonList.propTypes = {
-  pokemons: PropTypes.arrayOf(
-    PropTypes.shape({
-      url: PropTypes.string.isRequired,
-    })
-  ).isRequired,
+  pokemons: PropTypes.array.isRequired,
 };
 
 export default PokemonList;
