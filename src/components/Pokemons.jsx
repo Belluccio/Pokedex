@@ -61,7 +61,7 @@ const Pokemons = () => {
   const handleLastPage = async () => {
     if (totalPages > 1) {
       try {
-        const lastUrl = `https://pokeapi.co/api/v2/pokemon?offset=${(totalPages - 1) * 20}&limit=20`;
+        const lastUrl = `https://pokeapi.co/api/v2/pokemon?offset=${(totalPages - 1) * 21}&limit=21`;
         const response = await axios.get(lastUrl);
         setAllPokemons(response.data.results);
         setNextUrl(response.data.next);

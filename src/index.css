@@ -2,3 +2,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Estilos globales */
+body {
+    background-color: #f6f8fc;
+  }
+  
+  /* Estilos para el componente Aside */
+  .aside-container {
+    background-color: #cbd5e0;
+  }
+  
+/* Estilos para el componente PokemonPreview */
+.pokemon-container {
+    background-color: #ffffff;
+    border-radius: 20px; /* Ajusta el radio del borde según sea necesario */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Agrega transición para transform y box-shadow */
+    overflow: hidden; /* Asegura que la imagen del Pokémon no se desborde */
+}
+
+.pokemon-image {
+    width: 100%; /* Asegura que la imagen del Pokémon ocupe todo el ancho del contenedor */
+    height: auto; /* Permite que la imagen del Pokémon se ajuste proporcionalmente al ancho */
+}
+
+.pokemon-container:hover {
+    transform: scale(1.05); /* Reducción del tamaño del contenedor del Pokémon */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 0, 0, 0.2); /* Agrega un efecto de sombra */
+}
