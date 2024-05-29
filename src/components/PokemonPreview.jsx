@@ -49,7 +49,7 @@ const PokemonPreview = ({ pokemon, onClick }) => {
         className="mx-auto mb-2 rounded-full overflow-hidden"
         style={{ maxHeight: '100px' }}
       />
-      <p className="text-xs font-bold mb-1">{`N° ${pokemonData.id}`}</p>
+      <p className="text-xs font-bold mb-1">{`N° ${parseInt(pokemonData.id, 10)}`}</p>
       <p className="font-outfit text-lg font-semibold mb-2">{pokemonData.name.charAt(0).toUpperCase() + pokemonData.name.slice(1)}</p>
       <div className="flex justify-center">
         {types.map((type, index) => (

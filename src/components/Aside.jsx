@@ -1,13 +1,13 @@
-import React from "react";
-import PokemonDetails from "./PokemonDetails";
+import React from 'react';
+import PokemonDetails from './PokemonDetails';
 import PropTypes from 'prop-types';
 
-const Aside = ({ pokemons }) => {
+const Aside = ({ pokemon }) => {
   return (
-    <aside className="bg-gray-200 p-4 rounded-lg">
+    <aside className="bg-gray-200 p-4 rounded-lg fixed right-0 top-0 h-screen w-[350px] overflow-auto shadow-lg">
       <h2 className="text-xl font-bold mb-4">Pokemon Details</h2>
-      {pokemons.length > 0 ? (
-        pokemons.map(pokemon => <PokemonDetails key={pokemon.id} pokemon={pokemon} />)
+      {pokemon ? (
+        <PokemonDetails pokemon={pokemon} />
       ) : (
         <div>No Pokemon selected</div>
       )}
@@ -16,7 +16,7 @@ const Aside = ({ pokemons }) => {
 };
 
 Aside.propTypes = {
-  pokemons: PropTypes.arrayOf(PropTypes.object).isRequired,
+  pokemon: PropTypes.object,
 };
 
 export default Aside;
