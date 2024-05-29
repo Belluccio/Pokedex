@@ -1,6 +1,6 @@
-// Aside.js
 import React from "react";
 import PokemonDetails from "./PokemonDetails";
+import PropTypes from 'prop-types';
 
 const Aside = ({ pokemon }) => {
   return (
@@ -13,6 +13,10 @@ const Aside = ({ pokemon }) => {
       )}
     </aside>
   );
+};
+
+Aside.propTypes = {
+  pokemon: PropTypes.object,
 };
 
 export default Aside;
