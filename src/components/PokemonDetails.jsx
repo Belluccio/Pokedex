@@ -33,6 +33,46 @@ const statColors = {
   speed: 'bg-purple-500',
 };
 
+const evolutionStonesList = [
+  'fire-stone',
+  'water-stone',
+  'thunder-stone',
+  'leaf-stone',
+  'moon-stone',
+  'sun-stone',
+  'dusk-stone',
+  'dawn-stone',
+  'shiny-stone',
+  'ice-stone',
+];
+
+const fetchEvolutionChain = async (url) => {
+  const response = await axios.get(url);
+  return response.data.chain;
+};
+
+const getEvolutionStonesFromChain = (evolutionChain) => {
+  const evolutionStones = new Set();
+
+  const traverseChain = (chain) => {
+    if (chain.evolves_to.length) {
+      chain.evolves_to.forEach((evolution) => {
+        if (evolution.evolution_details.length) {
+          evolution.evolution_details.forEach((detail) => {
+            if (evolutionStonesList.includes(detail.item?.name)) {
+              evolutionStones.add(detail.item.name);
+            }
+          });
+        }
+        traverseChain(evolution);
+      });
+    }
+  };
+
+  traverseChain(evolutionChain);
+  return Array.from(evolutionStones);
+};
+
 const PokemonDetails = ({ pokemon }) => {
   const [description, setDescription] = useState('');
   const [evolutions, setEvolutions] = useState([]);
@@ -55,8 +95,7 @@ const PokemonDetails = ({ pokemon }) => {
           }
 
           if (evolution_chain) {
-            const chainResponse = await axios.get(evolution_chain.url);
-            const { chain } = chainResponse.data;
+            const chain = await fetchEvolutionChain(evolution_chain.url);
 
             const fetchEvolutionsRecursive = async (evolutionChain) => {
               let evolutionsList = [];
@@ -77,6 +116,9 @@ const PokemonDetails = ({ pokemon }) => {
 
             const evolutionsList = await fetchEvolutionsRecursive(chain);
             setEvolutions(evolutionsList);
+
+            const stones = getEvolutionStonesFromChain(chain);
+            setEvolutionStones(stones);
           }
         } catch (error) {
           console.error('Error fetching evolution details:', error);
@@ -86,23 +128,6 @@ const PokemonDetails = ({ pokemon }) => {
       };
 
       fetchEvolutionDetails();
-    }
-  }, [pokemon]);
-
-  useEffect(() => {
-    if (pokemon) {
-      const fetchEvolutionStones = async () => {
-        try {
-          const response = await axios.get('https://pokeapi.co/api/v2/item?limit=1000');
-          const stonesData = response.data.results.filter(item => item.name.includes('stone'));
-          console.log('Fetched Evolution Stones:', stonesData); // Verificar los datos
-          setEvolutionStones(stonesData);
-        } catch (error) {
-          console.error('Error fetching evolution stones:', error);
-        }
-      };
-
-      fetchEvolutionStones();
     }
   }, [pokemon]);
 
@@ -221,8 +246,8 @@ const PokemonDetails = ({ pokemon }) => {
           <h3 className="text-xl font-semibold mb-2">Evolution Stones</h3>
           <ul className="flex flex-wrap justify-center space-x-2">
             {evolutionStones.map((stone) => (
-              <li key={stone.name} className="bg-gray-300 rounded-full px-3 py-1 text-sm">
-                {stone.name.charAt(0).toUpperCase() + stone.name.slice(1)}
+              <li key={stone} className="bg-gray-300 rounded-full px-3 py-1 text-sm">
+                {stone.charAt(0).toUpperCase() + stone.slice(1).replace('-', ' ')}
               </li>
             ))}
           </ul>
