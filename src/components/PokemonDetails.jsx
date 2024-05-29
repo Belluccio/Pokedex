@@ -78,7 +78,39 @@ const PokemonDetails = ({ pokemon }) => {
   const [evolutions, setEvolutions] = useState([]);
   const [evolutionStones, setEvolutionStones] = useState([]);
   const [captureLocations, setCaptureLocations] = useState([]);
+  const [levelUpMoves, setLevelUpMoves] = useState([]);
+  const [tmMoves, setTmMoves] = useState([]);
   const [loading, setLoading] = useState(true); // Estado para manejar la carga
+  const [showLevelUpMoves, setShowLevelUpMoves] = useState(false);
+  const [showTmMoves, setShowTmMoves] = useState(false);
+  const [showCaptureLocations, setShowCaptureLocations] = useState(false);
+
+  const fetchMoves = async (pokemonId) => {
+    try {
+      const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
+      const moves = response.data.moves;
+
+      const levelUp = new Map();
+      const tm = new Set();
+
+      moves.forEach(move => {
+        move.version_group_details.forEach(detail => {
+          if (detail.move_learn_method.name === 'level-up') {
+            if (!levelUp.has(move.move.name) || detail.level_learned_at < levelUp.get(move.move.name)) {
+              levelUp.set(move.move.name, detail.level_learned_at);
+            }
+          } else if (detail.move_learn_method.name === 'machine') {
+            tm.add(move.move.name);
+          }
+        });
+      });
+
+      setLevelUpMoves(Array.from(levelUp.entries()).sort((a, b) => a[1] - b[1]).map(([move, level]) => ({ move, level })));
+      setTmMoves(Array.from(tm));
+    } catch (error) {
+      console.error('Error fetching moves:', error);
+    }
+  };
 
   useEffect(() => {
     if (pokemon && pokemon.species) {
@@ -143,6 +175,7 @@ const PokemonDetails = ({ pokemon }) => {
       };
 
       fetchCaptureLocations();
+      fetchMoves(pokemon.id);
     }
   }, [pokemon]);
 
@@ -160,19 +193,25 @@ const PokemonDetails = ({ pokemon }) => {
   return (
     <div className="pokemon-details relative bg-gray-200 p-6 rounded-lg shadow-lg text-center w-full h-full overflow-auto">
       <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `url(https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
-      <div className="relative">
-        <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`} alt={name} className="mx-auto w-32 h-32 mb-4" />
-        <p className="text-sm text-gray-500">{`N° ${id}`}</p>
-        <h2 className="text-2xl font-bold mt-2 mb-4">{name.charAt(0).toUpperCase() + name.slice(1)}</h2>
-        <div className="mb-4 flex justify-center space-x-4">
-          <p className="text-sm"><span className="font-semibold">Height:</span> {height / 10} m</p>
-          <p className="text-sm"><span className="font-semibold">Weight:</span> {weight / 10} kg</p>
+      <div className="relative flex flex-col items-center">
+        <div className="flex flex-col items-center">
+          <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`} alt={name} className="mx-auto w-32 h-32 mb-4" />
+          <p className="text-sm text-gray-500">{`N° ${id}`}</p>
+          <h2 className="text-2xl font-bold mt-2 mb-4">{name.charAt(0).toUpperCase() + name.slice(1)}</h2>
+        </div>
+        <div className="flex flex-col items-center mt-4">
+          <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${id}.png`} alt={`Shiny ${name}`} className="mx-auto w-32 h-32 mb-4" />
+          <p className="text-sm text-gray-500">{`Shiny ${name.charAt(0).toUpperCase() + name.slice(1)}`}</p>
+        </div>
+        <div className="mb-4">
+          <p className="text-lg"><strong>Height:</strong> {height / 10} m</p>
+          <p className="text-lg"><strong>Weight:</strong> {weight / 10} kg</p>
         </div>
         {description && (
           <p className="text-lg mt-2"><strong>Description:</strong> {description}</p>
         )}
         <div className="mt-4">
-          <h3 className="text-xl font-semibold mb-2">Stats</h3>
+          <h3 className="text-lg font-semibold mb-2">Stats</h3>
           <div className="grid grid-cols-6 gap-2 justify-center">
             {stats.map((stat) => (
               <div key={stat.stat.name} className={`px-2 py-1 rounded-full text-sm text-white ${statColors[stat.stat.name] || 'bg-gray-300'}`}>
@@ -190,7 +229,7 @@ const PokemonDetails = ({ pokemon }) => {
           </div>
         </div>
         <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-2">Abilities</h3>
+          <h3 className="text-lg font-semibold mb-2">Abilities</h3>
           <ul className="flex flex-wrap justify-center space-x-2">
             {abilities.map((ability, index) => (
               <li key={index} className="bg-gray-300 rounded-full px-3 py-1 text-sm">
@@ -200,7 +239,7 @@ const PokemonDetails = ({ pokemon }) => {
           </ul>
         </div>
         <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-2">Types</h3>
+          <h3 className="text-lg font-semibold mb-2">Types</h3>
           <div className="flex justify-center space-x-2">
             {types.map((type, index) => (
               <span key={index} className={`text-white px-3 py-1 rounded-full ${typeColors[type.type.name]}`}>
@@ -210,7 +249,7 @@ const PokemonDetails = ({ pokemon }) => {
           </div>
         </div>
         <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-2">Weaknesses</h3>
+          <h3 className="text-lg font-semibold mb-2">Weaknesses</h3>
           <div className="flex flex-wrap justify-center space-x-2">
             {weaknesses.map((weakness, index) => (
               <span key={index} className={`${typeColors[weakness]} text-white px-2 py-1 rounded-full text-sm`}>
@@ -220,7 +259,7 @@ const PokemonDetails = ({ pokemon }) => {
           </div>
         </div>
         <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-2">Resistances</h3>
+          <h3 className="text-lg font-semibold mb-2">Resistances</h3>
           <div className="flex flex-wrap justify-center space-x-2">
             {resistances.map((resistance, index) => (
               <span key={index} className={`${typeColors[resistance]} text-white px-2 py-1 rounded-full text-sm`}>
@@ -230,7 +269,7 @@ const PokemonDetails = ({ pokemon }) => {
           </div>
         </div>
         <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-2">Evolutions</h3>
+          <h3 className="text-lg font-semibold mb-2">Evolutions</h3>
           <ul className="flex flex-wrap justify-center space-x-2">
             {evolutions.map((evolution) => (
               <li key={evolution.id} className="flex flex-col items-center">
@@ -243,7 +282,7 @@ const PokemonDetails = ({ pokemon }) => {
           </ul>
         </div>
         <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-2">Evolution Stones</h3>
+          <h3 className="text-lg font-semibold mb-2">Evolution Stones</h3>
           <ul className="flex flex-wrap justify-center space-x-2">
             {evolutionStones.map((stone) => (
               <li key={stone} className="bg-gray-300 rounded-full px-3 py-1 text-sm">
@@ -253,14 +292,46 @@ const PokemonDetails = ({ pokemon }) => {
           </ul>
         </div>
         <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-2">Capture Locations</h3>
-          <ul className="flex flex-wrap justify-center space-x-2">
-            {captureLocations.map((location) => (
-              <li key={location.location_area.name} className="bg-gray-300 rounded-full px-3 py-1 text-sm">
-                {location.location_area.name.charAt(0).toUpperCase() + location.location_area.name.slice(1)}
-              </li>
-            ))}
-          </ul>
+          <h3 className="text-lg font-semibold mb-2 cursor-pointer flex justify-between items-center" onClick={() => setShowLevelUpMoves(!showLevelUpMoves)}>
+            Moves Learned by Level Up <span>{showLevelUpMoves ? '▲' : '▼'}</span>
+          </h3>
+          {showLevelUpMoves && (
+            <ul className="flex flex-wrap justify-center space-x-2">
+              {levelUpMoves.map((move, index) => (
+                <li key={index} className="bg-gray-300 rounded-full px-3 py-1 text-sm">
+                  {`${move.move.charAt(0).toUpperCase() + move.move.slice(1)} (Lvl ${move.level})`}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-2 cursor-pointer flex justify-between items-center" onClick={() => setShowTmMoves(!showTmMoves)}>
+            Moves Learned by TM <span>{showTmMoves ? '▲' : '▼'}</span>
+          </h3>
+          {showTmMoves && (
+            <ul className="flex flex-wrap justify-center space-x-2">
+              {tmMoves.map((move, index) => (
+                <li key={index} className="bg-gray-300 rounded-full px-3 py-1 text-sm">
+                  {move.charAt(0).toUpperCase() + move.slice(1)}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-2 cursor-pointer flex justify-between items-center" onClick={() => setShowCaptureLocations(!showCaptureLocations)}>
+            Capture Locations <span>{showCaptureLocations ? '▲' : '▼'}</span>
+          </h3>
+          {showCaptureLocations && (
+            <ul className="flex flex-wrap justify-center space-x-2">
+              {captureLocations.map((location) => (
+                <li key={location.location_area.name} className="bg-gray-300 rounded-full px-3 py-1 text-sm">
+                  {location.location_area.name.charAt(0).toUpperCase() + location.location_area.name.slice(1)}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>
