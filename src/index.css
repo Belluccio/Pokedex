@@ -30,3 +30,31 @@ body {
     transform: scale(1.05); /* Reducción del tamaño del contenedor del Pokémon */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 0, 0, 0.2); /* Agrega un efecto de sombra */
 }
+
+
+.normal { background-color: #A8A77A; }
+.fire { background-color: #EE8130; }
+.water { background-color: #6390F0; }
+/* Añade los demás tipos... */
+
+
+.pokemon-details {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+}
+.pokemon-details h2 {
+  margin-top: 0;
+}
+.pokemon-details img {
+  display: block;
+  margin: 0 auto 20px;
+}
+.pokemon-details ul {
+  list-style: none;
+  padding: 0;
+}
+.pokemon-details ul li {
+  margin: 5px 0;
+}

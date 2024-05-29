@@ -20,7 +20,7 @@ const Pokemons = ({ onPokemonSelect }) => {
       setLoading(true);
       const response = await axios.get(`https://pokeapi.co/api/v2/pokemon?offset=${(pageNumber - 1) * 20}&limit=20`);
       const newPokemons = response.data.results;
-      setAllPokemons(prevPokemons => [...prevPokemons, ...newPokemons]);
+      setAllPokemons(prevPokemons => pageNumber === 1 ? newPokemons : [...prevPokemons, ...newPokemons]);
       setHasMore(newPokemons.length > 0);
     } catch (error) {
       console.error("Error fetching Pokemon data:", error);
