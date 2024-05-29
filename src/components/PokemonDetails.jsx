@@ -36,6 +36,8 @@ const statColors = {
 const PokemonDetails = ({ pokemon }) => {
   const [description, setDescription] = useState('');
   const [evolutions, setEvolutions] = useState([]);
+  const [evolutionStones, setEvolutionStones] = useState([]);
+  const [captureLocations, setCaptureLocations] = useState([]);
   const [loading, setLoading] = useState(true); // Estado para manejar la carga
 
   useEffect(() => {
@@ -87,6 +89,38 @@ const PokemonDetails = ({ pokemon }) => {
     }
   }, [pokemon]);
 
+  useEffect(() => {
+    if (pokemon) {
+      const fetchEvolutionStones = async () => {
+        try {
+          const response = await axios.get('https://pokeapi.co/api/v2/item?limit=1000');
+          const stonesData = response.data.results.filter(item => item.name.includes('stone'));
+          console.log('Fetched Evolution Stones:', stonesData); // Verificar los datos
+          setEvolutionStones(stonesData);
+        } catch (error) {
+          console.error('Error fetching evolution stones:', error);
+        }
+      };
+
+      fetchEvolutionStones();
+    }
+  }, [pokemon]);
+
+  useEffect(() => {
+    if (pokemon) {
+      const fetchCaptureLocations = async () => {
+        try {
+          const locationsResponse = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.id}/encounters`);
+          setCaptureLocations(locationsResponse.data);
+        } catch (error) {
+          console.error('Error fetching capture locations:', error);
+        }
+      };
+
+      fetchCaptureLocations();
+    }
+  }, [pokemon]);
+
   if (loading) {
     return <LoadingSpinner />; // Muestra el spinner mientras los datos están siendo cargados
   }
@@ -99,7 +133,7 @@ const PokemonDetails = ({ pokemon }) => {
   const { weaknesses, resistances } = getTypeEffectiveness(types);
 
   return (
-    <div className="pokemon-details relative bg-gray-200 p-6 rounded-lg shadow-lg text-center">
+    <div className="pokemon-details relative bg-gray-200 p-6 rounded-lg shadow-lg text-center w-full h-full overflow-auto">
       <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `url(https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
       <div className="relative">
         <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`} alt={name} className="mx-auto w-32 h-32 mb-4" />
@@ -173,12 +207,32 @@ const PokemonDetails = ({ pokemon }) => {
         <div className="mt-6">
           <h3 className="text-xl font-semibold mb-2">Evolutions</h3>
           <ul className="flex flex-wrap justify-center space-x-2">
-            {evolutions.map((evolution, index) => (
-              <li key={index} className="flex flex-col items-center">
+            {evolutions.map((evolution) => (
+              <li key={evolution.id} className="flex flex-col items-center">
                 <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evolution.id}.png`} alt={evolution.name} className="w-8 h-8 mb-1" />
                 <span className="bg-gray-300 rounded-full px-3 py-1 text-sm">
                   {evolution.name.charAt(0).toUpperCase() + evolution.name.slice(1)}
                 </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="mt-6">
+          <h3 className="text-xl font-semibold mb-2">Evolution Stones</h3>
+          <ul className="flex flex-wrap justify-center space-x-2">
+            {evolutionStones.map((stone) => (
+              <li key={stone.name} className="bg-gray-300 rounded-full px-3 py-1 text-sm">
+                {stone.name.charAt(0).toUpperCase() + stone.name.slice(1)}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="mt-6">
+          <h3 className="text-xl font-semibold mb-2">Capture Locations</h3>
+          <ul className="flex flex-wrap justify-center space-x-2">
+            {captureLocations.map((location) => (
+              <li key={location.location_area.name} className="bg-gray-300 rounded-full px-3 py-1 text-sm">
+                {location.location_area.name.charAt(0).toUpperCase() + location.location_area.name.slice(1)}
               </li>
             ))}
           </ul>
