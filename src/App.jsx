@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Pokemons from "./components/Pokemons";
 import Aside from "./components/Aside";
+import './index.css'; //
 
 function App() {
   const [selectedPokemon, setSelectedPokemon] = useState(null);

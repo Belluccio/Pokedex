@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { typeColors } from './PokemonPreview'; // Importa typeColors desde PokemonPreview
+import LoadingSpinner from './LoadingSpinner'; // Importa el componente LoadingSpinner
 
 const typeEffectiveness = {
   normal: { weakTo: ['fighting'], resistantTo: ['ghost'] },
@@ -33,15 +34,17 @@ const statColors = {
 };
 
 const PokemonDetails = ({ pokemon }) => {
-  const [evolutionNames, setEvolutionNames] = useState([]);
   const [description, setDescription] = useState('');
+  const [evolutions, setEvolutions] = useState([]);
+  const [loading, setLoading] = useState(true); // Estado para manejar la carga
 
   useEffect(() => {
     if (pokemon && pokemon.species) {
-      const fetchEvolutionNames = async () => {
+      setLoading(true); // Inicia la carga
+      const fetchEvolutionDetails = async () => {
         try {
           const response = await axios.get(pokemon.species.url);
-          const { evolves_from_species, evolution_chain, flavor_text_entries } = response.data;
+          const { evolution_chain, flavor_text_entries } = response.data;
 
           // Obtener la descripción en inglés
           const englishText = flavor_text_entries.find(entry => entry.language.name === 'en');
@@ -49,40 +52,44 @@ const PokemonDetails = ({ pokemon }) => {
             setDescription(englishText.flavor_text.replace(/(\r\n|\n|\r)/gm, ' ')); // Elimina saltos de línea
           }
 
-          if (evolves_from_species) {
-            const evolvesFromResponse = await axios.get(evolves_from_species.url);
-            const evolvesFromData = evolvesFromResponse.data;
-            if (evolvesFromData && evolvesFromData.varieties && evolvesFromData.varieties.length > 0) {
-              const evolvesFromPokemon = evolvesFromData.varieties[0].pokemon;
-              setEvolutionNames((prevNames) => [...new Set([...prevNames, evolvesFromPokemon.name])]);
-            }
-          }
           if (evolution_chain) {
             const chainResponse = await axios.get(evolution_chain.url);
             const { chain } = chainResponse.data;
-            const evolutionNamesList = new Set();
-            const fetchEvolutionNamesRecursive = (evolutionChain) => {
+
+            const fetchEvolutionsRecursive = async (evolutionChain) => {
+              let evolutionsList = [];
               if (evolutionChain.species) {
-                const speciesName = evolutionChain.species.name;
-                evolutionNamesList.add(speciesName);
+                const speciesResponse = await axios.get(evolutionChain.species.url);
+                const speciesData = speciesResponse.data;
+                const id = speciesData.id;
+                evolutionsList.push({ name: speciesData.name, id });
               }
               if (evolutionChain.evolves_to && evolutionChain.evolves_to.length > 0) {
-                evolutionChain.evolves_to.forEach(evolution => {
-                  fetchEvolutionNamesRecursive(evolution);
-                });
+                for (const evolution of evolutionChain.evolves_to) {
+                  const subEvolutions = await fetchEvolutionsRecursive(evolution);
+                  evolutionsList = evolutionsList.concat(subEvolutions);
+                }
               }
+              return evolutionsList;
             };
-            fetchEvolutionNamesRecursive(chain);
-            setEvolutionNames([...evolutionNamesList]);
+
+            const evolutionsList = await fetchEvolutionsRecursive(chain);
+            setEvolutions(evolutionsList);
           }
         } catch (error) {
-          console.error('Error fetching evolution names:', error);
+          console.error('Error fetching evolution details:', error);
+        } finally {
+          setLoading(false); // Finaliza la carga
         }
       };
 
-      fetchEvolutionNames();
+      fetchEvolutionDetails();
     }
   }, [pokemon]);
+
+  if (loading) {
+    return <LoadingSpinner />; // Muestra el spinner mientras los datos están siendo cargados
+  }
 
   if (!pokemon) {
     return <div>No Pokémon selected</div>;
@@ -166,9 +173,12 @@ const PokemonDetails = ({ pokemon }) => {
         <div className="mt-6">
           <h3 className="text-xl font-semibold mb-2">Evolutions</h3>
           <ul className="flex flex-wrap justify-center space-x-2">
-            {evolutionNames.map((evolution, index) => (
-              <li key={index} className="bg-gray-300 rounded-full px-3 py-1 text-sm">
-                {evolution.charAt(0).toUpperCase() + evolution.slice(1)}
+            {evolutions.map((evolution, index) => (
+              <li key={index} className="flex flex-col items-center">
+                <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evolution.id}.png`} alt={evolution.name} className="w-8 h-8 mb-1" />
+                <span className="bg-gray-300 rounded-full px-3 py-1 text-sm">
+                  {evolution.name.charAt(0).toUpperCase() + evolution.name.slice(1)}
+                </span>
               </li>
             ))}
           </ul>
