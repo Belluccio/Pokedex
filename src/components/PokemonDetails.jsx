@@ -265,9 +265,9 @@ const PokemonDetails = ({ pokemon }) => {
         {evolutions.length > 0 && (
           <div className="mb-4">
             <h3 className="text-xl font-semibold mb-2">Evolutions</h3>
-            <ul className="flex justify-center">
+            <ul className="flex flex-wrap justify-center"> {/* Cambiado de flex a flex-wrap */}
               {evolutions.map((evolution, index) => (
-                <li key={index} className="flex flex-col items-center capitalize mx-2">
+                <li key={index} className="flex flex-col items-center capitalize mx-2 my-2"> {/* Añadido my-2 para separación vertical */}
                   <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${evolution.id}.png`} alt={evolution.name} className="w-16 h-16 mb-2" />
                   {evolution.name}
                 </li>
