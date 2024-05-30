@@ -184,9 +184,9 @@ const PokemonDetails = ({ pokemon }) => {
           <p className="text-sm text-gray-500">{`N° ${id}`}</p>
           <h2 className="text-2xl font-bold mt-2 mb-4">{name.charAt(0).toUpperCase() + name.slice(1)}</h2>
           <img src={shinyImage} alt={`${name} shiny`} className="mx-auto w-32 h-32 mb-1" />
-          <p className="text-sm text-gray-500">Shiny Version</p>
+          <p className="text-sm text-gray-500 mb-4">Shiny Version</p> {/* Ajuste del margen inferior */}
         </div>
-        <div className="mb-4">
+        <div className="mb-8"> {/* Aumentar el margen inferior */}
           <p className="text-lg"><strong>Height:</strong> {height / 10} m</p>
           <p className="text-lg"><strong>Weight:</strong> {weight / 10} kg</p>
         </div>
@@ -232,7 +232,7 @@ const PokemonDetails = ({ pokemon }) => {
         <div className="mb-4">
           <h3 className="text-xl font-semibold mb-2">Type Effectiveness</h3>
           <div className="flex flex-wrap justify-center">
-            <div className="w-full md:w-1/2 px-2">
+            <div className="w-full md:w-1/2 px-2 mb-4"> {/* Ajuste del margen inferior */}
               <h4 className="text-lg font-semibold mb-2">Weaknesses</h4>
               {weaknesses.length ? (
                 <ul className="flex flex-wrap justify-center">
@@ -246,7 +246,7 @@ const PokemonDetails = ({ pokemon }) => {
                 <p>None</p>
               )}
             </div>
-            <div className="w-full md:w-1/2 px-2">
+            <div className="w-full md:w-1/2 px-2 mb-4"> {/* Ajuste del margen inferior */}
               <h4 className="text-lg font-semibold mb-2">Resistances</h4>
               {resistances.length ? (
                 <ul className="flex flex-wrap justify-center">
