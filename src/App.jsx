@@ -1,6 +1,7 @@
 // App.js
 
 import React, { useState, useEffect } from 'react';
+import { CSSTransition } from 'react-transition-group';
 import Pokemons from "./components/Pokemons";
 import Aside from "./components/Aside";
 import './index.css'; //
@@ -40,7 +41,14 @@ function App() {
     <section>
       <main className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_350px] h-screen font-outfit relative">
         <Pokemons onPokemonSelect={handlePokemonSelect} />
-        <Aside pokemon={selectedPokemon} onPokemonClose={handlePokemonClose} />
+        <CSSTransition
+          in={!!selectedPokemon}
+          timeout={300}
+          classNames="aside-transition"
+          unmountOnExit
+        >
+          <Aside pokemon={selectedPokemon} onPokemonClose={handlePokemonClose} />
+        </CSSTransition>
         {showScrollTopButton && (
           <button
             onClick={scrollToTop}
