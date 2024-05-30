@@ -84,6 +84,7 @@ const PokemonDetails = ({ pokemon }) => {
   const [showLevelUpMoves, setShowLevelUpMoves] = useState(false);
   const [showTmMoves, setShowTmMoves] = useState(false);
   const [showCaptureLocations, setShowCaptureLocations] = useState(false);
+  const [shinyImage, setShinyImage] = useState('');
 
   useEffect(() => {
     const fetchPokemonData = async () => {
@@ -147,6 +148,11 @@ const PokemonDetails = ({ pokemon }) => {
 
           setLevelUpMoves(Array.from(levelUp.entries()).sort((a, b) => a[1] - b[1]).map(([move, level]) => ({ move, level })));
           setTmMoves(Array.from(tm));
+
+          // Obtener imagen shiny
+          const shinyImageResponse = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.id}`);
+          setShinyImage(shinyImageResponse.data.sprites.other['official-artwork'].front_shiny);
+
         } catch (error) {
           console.error('Error fetching data:', error);
         } finally {
@@ -175,9 +181,10 @@ const PokemonDetails = ({ pokemon }) => {
       <div className="relative flex flex-col items-center">
         <div className="flex flex-col items-center">
           <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`} alt={name} className="mx-auto w-32 h-32 mb-4" />
-          <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/${id}.gif`} alt={`${name} shiny`} className="mx-auto w-32 h-32 mb-4" />
           <p className="text-sm text-gray-500">{`N° ${id}`}</p>
           <h2 className="text-2xl font-bold mt-2 mb-4">{name.charAt(0).toUpperCase() + name.slice(1)}</h2>
+          <img src={shinyImage} alt={`${name} shiny`} className="mx-auto w-32 h-32 mb-1" />
+          <p className="text-sm text-gray-500">Shiny Version</p>
         </div>
         <div className="mb-4">
           <p className="text-lg"><strong>Height:</strong> {height / 10} m</p>
