@@ -83,3 +83,11 @@ body {
   }
 }
 
+/* styles.css */
+
+.close-button {
+  width: 2.5rem; /* Ajusta según sea necesario */
+  height: 2.5rem; /* Ajusta según sea necesario */
+  border-radius: 50%; /* Hace que el botón sea un círculo perfecto */
+}
+

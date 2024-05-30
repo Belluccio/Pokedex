@@ -1,3 +1,5 @@
+// App.js
+
 import React, { useState, useEffect } from 'react';
 import Pokemons from "./components/Pokemons";
 import Aside from "./components/Aside";
@@ -16,7 +18,7 @@ function App() {
       setShowScrollTopButton(true);
     } else {
       setShowScrollTopButton(false);
-    };
+    }
   };
 
   const scrollToTop = () => {
@@ -30,11 +32,15 @@ function App() {
     };
   }, []);
 
+  const handlePokemonClose = () => {
+    setSelectedPokemon(null); // Actualiza el estado para cerrar el detalle del Pokémon
+  };
+
   return (
     <section>
       <main className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_350px] h-screen font-outfit relative">
         <Pokemons onPokemonSelect={handlePokemonSelect} />
-        <Aside pokemon={selectedPokemon} />
+        <Aside pokemon={selectedPokemon} onPokemonClose={handlePokemonClose} />
         {showScrollTopButton && (
           <button
             onClick={scrollToTop}
