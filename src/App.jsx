@@ -37,6 +37,8 @@ function App() {
     setSelectedPokemon(null); // Actualiza el estado para cerrar el detalle del Pokémon
   };
 
+  const isMobile = window.innerWidth <= 768;
+
   return (
     <section>
       <main className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_350px] h-screen font-outfit relative">
@@ -49,7 +51,7 @@ function App() {
         >
           <Aside pokemon={selectedPokemon} onPokemonClose={handlePokemonClose} />
         </CSSTransition>
-        {showScrollTopButton && (
+        {showScrollTopButton && (!selectedPokemon || !isMobile) && (
           <button
             onClick={scrollToTop}
             className="fixed bottom-10 lg:right-[375px] right-10 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 w-12 h-12 flex items-center justify-center"

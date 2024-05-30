@@ -111,3 +111,9 @@ body {
   transition: opacity 300ms, transform 300ms;
 }
 
+
+@media (max-width: 768px) {
+  .scroll-to-top-button {
+    /* Asegurarse de que el botón esté correctamente alineado y visible en la versión móvil */
+  }
+}
